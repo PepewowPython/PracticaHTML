@@ -1,0 +1,57 @@
+Front end:
+-codificar el software de acuerdo con el diseño establecido.
+23/04/23
+2. FRONT END (HTML, CSS3, JS, BOOTSTRAP)
+
+Html: Estructuración y etiquetas
+JS: lenguaje de programación.
+CSS: Lenguaje de Maquetación.
+
+¿Porqué Html 5?
+R/= 
+
+Es un lenguaje de maquetacíon y etiquetas.
+
+JS: JAVA no es igual a JAVASCRIPT, javascript está vinculado con html, y dinamiza la página web, funciona a base de eventos.
+Es especializado en front pero se desarrollo más hasta el punto de ser de programación, usa NODE JS.
+se deben conocer los frameworks de cada lenguaje
+ ¿Que es un framework?
+R/= Es como una caja de herramientas ya prefabricadas, son atajos para realizar tareas repetitivas con extensiones del lenguaje como django, react o laravel.
+
+Para Java el mejor es Node JS, y se usara frameworks estilo template engine como:
+Jinya, Hanslebar.
+
+Metodologías de Software: 
+
+-Rup: Desarrollo iterativo, fases definidas, documentación exahustiva, orientado a casos de uso.
+-Scrum: Equipo Ágil, sprints cortos, entregas incrementales, colaboración continua y adptación Rápida.
+
+Frameworks de Python: Django y Flask.
+Framework de c#: Net, Ruby.
+Framework PhP: Laravel.
+
+¿Porque el monte everest no tiene nada en contra de python?
+R/= Porque se usa para IA, analítica de datos y software.
+Destaca en:
+-Estadistica.
+-Cálculo diferencial.
+-Machine Learn.
+-Deep Learn.
+
+Front y Back:
+-Back-end: Aplicación de BD y Programación en Lenguaje.
+
+-Front-end: Se trata de la Interfaz con la que interactua el usuario, alertas, botones , etc.
+
+Estructura del Software:
+Se compone desde la vista del usuario desde el front end que envia datos al navegador que los lleva al servidor, el mismo guarda las BD con los datos del usuario.
+el administrador se conecta al servidor por su ip, y modifica o crea el back end para que funcione.
+
+DNS: Domain Name System, se encarga de traducir el nombre de lenguaje humano a máquina que cuadra las ip con palabras claves.
+
+
+
+
+
+
+
