@@ -1,0 +1,165 @@
+* {
+    vertical-align: baseline;
+    font-weight: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    border: 0 none;
+    outline: 0;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-size: 100%;
+    font-family: Cambria, serif;
+    color: #FFF;
+    background-color: gray;
+}
+
+/* HEADER */
+
+header {
+    width: 100%;
+    padding: 30px 0%;
+    background: rgb(70,70,70);
+}
+
+header h1 {
+    font-size: 2em;
+}
+
+header p {
+    font-size: 1.3em;
+}
+
+/* CONTENEDOR */
+
+#contenedor {
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* NAV */
+
+nav {
+    width: 100%;
+    overflow: auto;
+    font-weight: bold;
+    margin: 15px 0px;
+}
+
+nav ul {
+    list-style: none;
+}
+
+nav li {
+    float: left;
+    margin: 8px;
+}
+
+li#rojo {
+    background-color: red;
+}
+
+nav a {
+    text-decoration: none;
+    color: rgb(70,70,70);
+}
+
+nav a:hover {
+    color: rgb(255,85,70);
+}
+
+/* IMAGEN PRINCIPAL */
+
+#imgPrinc {
+    width: 100%;
+    height: 400px;
+    background: darkgray;
+    position: relative;
+}
+
+#imgPrinc p {
+    background-color: rgb(255,85,70);
+    width: 50%;
+    padding: 15px;
+    position: absolute;
+    bottom: 0px;
+}
+
+/* SPAN */
+
+span:nth-child(1) {
+    color: yellow;
+}
+
+span:nth-child(2) {
+    color: cyan;
+}
+
+span:nth-child(3) {
+    color: red;
+}
+
+/* ASIDE */
+
+aside {
+    width: 32%;
+    float: left;
+}
+
+aside section {
+    height: 70px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgb(255,85,70);
+}
+
+/* PLANES */
+
+.planes {
+    width: 32%;
+    height: 290px;
+    float: left;
+    background: red;
+    position: relative;
+}
+
+.planes p {
+    position: absolute;
+    bottom: 0px;
+    background-color: rgb(255,85,70);
+    padding: 5px 0px;
+    width: 100%;
+    text-align: center;
+}
+
+/* BLOCKQUOTE */
+
+blockquote {
+    clear: both;
+    background: white;
+    color: rgb(70,70,70);
+    font-style: italic;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+/* FOOTER */
+
+footer {
+    width: 100%;
+    padding: 30px 0%;
+    background: rgb(70,70,70);
+    overflow: auto;
+}
+
+footer div {
+    width: 80%;
+    margin: 0 auto;
+}
+
+footer p {
+    padding-top: 12px;
+}
