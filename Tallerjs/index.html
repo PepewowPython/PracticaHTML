@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Tech Store - Taller JS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 9. Menú de navegación fijo (sticky) y 6. Reloj digital -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">TechFlow</div>
+        <div class="nav-clock" id="digital-clock">00:00:00</div>
+        <ul class="nav-links">
+            <li><a href="#hero">Inicio</a></li>
+            <li><a href="#tabs-section">Info</a></li>
+            <li><a href="#products">Productos</a></li>
+            <li><a href="#contact">Contacto</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button id="login-btn" class="btn btn-outline">Login</button>
+            <button id="cart-btn" class="btn btn-primary">
+                Carrito (<span id="cart-count">0</span>)
+            </button>
+        </div>
+    </nav>
+
+    <!-- 7. Login Page (Modal) -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-btn" id="close-login">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-user">Usuario</label>
+                    <input type="text" id="login-user" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label for="login-pass">Contraseña</label>
+                    <input type="password" id="login-pass" placeholder="1234">
+                </div>
+                <div id="login-feedback" class="feedback-msg"></div>
+                <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Carrito de compras (Sidebar) -->
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Tu Carrito</h2>
+            <span class="close-btn" id="close-cart">&times;</span>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <p class="empty-cart">El carrito está vacío</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">Total: $<span id="cart-total-price">0</span></div>
+            <button class="btn btn-primary w-100">Comprar</button>
+        </div>
+    </div>
+
+    <!-- 3. Animación de texto deslizándose de derecha a izquierda -->
+    <header id="hero" class="hero-section">
+        <div class="hero-content">
+            <h1 class="sliding-text">Bienvenido al Futuro</h1>
+            <p class="sliding-text delay-1">Descubre la mejor tecnología al alcance de tu mano.</p>
+            <a href="#products" class="btn btn-primary sliding-text delay-2">Ver Productos</a>
+        </div>
+    </header>
+
+    <!-- 8. Sistema de pestañas (tabs) -->
+    <section id="tabs-section" class="section glass-panel container">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tab-about">Sobre Nosotros</button>
+            <button class="tab-btn" data-tab="tab-services">Servicios</button>
+            <button class="tab-btn" data-tab="tab-faq">FAQ</button>
+        </div>
+        <div class="tabs-content">
+            <div id="tab-about" class="tab-pane active">
+                <h3>Nuestra Misión</h3>
+                <p>Somos una empresa dedicada a traer la mejor tecnología con diseños vanguardistas y experiencias de usuario excepcionales. Creemos en un futuro conectado y accesible para todos.</p>
+            </div>
+            <div id="tab-services" class="tab-pane">
+                <h3>Lo que ofrecemos</h3>
+                <ul>
+                    <li>Venta de hardware de última generación.</li>
+                    <li>Soporte técnico 24/7.</li>
+                    <li>Envíos a todo el país en menos de 24 horas.</li>
+                </ul>
+            </div>
+            <div id="tab-faq" class="tab-pane">
+                <h3>Preguntas Frecuentes</h3>
+                <p><strong>¿Aceptan devoluciones?</strong> Sí, tienes 30 días para devolver cualquier producto sellado.</p>
+                <p><strong>¿Tienen tienda física?</strong> Por el momento somos 100% online para ofrecerte los mejores precios.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Lista de productos -->
+    <section id="products" class="section container">
+        <h2 class="section-title">Nuestros Productos</h2>
+        <div class="product-grid" id="product-list">
+            <!-- Productos generados dinámicamente o estáticos -->
+            <div class="product-card glass-panel">
+                <!-- 4. Imágenes ampliables (Lightbox) -->
+                <img src="https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=500&q=80" alt="iPhone" class="product-img lightbox-trigger">
+                <div class="product-info">
+                    <h3>Smartphone Alpha</h3>
+                    <p class="price">$999</p>
+                    <button class="btn btn-primary add-to-cart" data-id="1" data-name="Smartphone Alpha" data-price="999" data-img="https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=100&q=80">Añadir al carrito</button>
+                </div>
+            </div>
+            <div class="product-card glass-panel">
+                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" alt="Auriculares" class="product-img lightbox-trigger">
+                <div class="product-info">
+                    <h3>Auriculares Pro</h3>
+                    <p class="price">$249</p>
+                    <button class="btn btn-primary add-to-cart" data-id="2" data-name="Auriculares Pro" data-price="249" data-img="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&q=80">Añadir al carrito</button>
+                </div>
+            </div>
+            <div class="product-card glass-panel">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80" alt="Cámara" class="product-img lightbox-trigger">
+                <div class="product-info">
+                    <h3>Cámara X-Series</h3>
+                    <p class="price">$1200</p>
+                    <button class="btn btn-primary add-to-cart" data-id="3" data-name="Cámara X-Series" data-price="1200" data-img="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100&q=80">Añadir al carrito</button>
+                </div>
+            </div>
+            <div class="product-card glass-panel">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80" alt="Zapatillas" class="product-img lightbox-trigger">
+                <div class="product-info">
+                    <h3>Zapatillas Runner</h3>
+                    <p class="price">$130</p>
+                    <button class="btn btn-primary add-to-cart" data-id="4" data-name="Zapatillas Runner" data-price="130" data-img="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&q=80">Añadir al carrito</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Lightbox (Caja de luz) -->
+    <div id="lightbox" class="lightbox">
+        <span class="close-lightbox" id="close-lightbox">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- 2. Formulario con validación (nombre, correo y teléfono) -->
+    <section id="contact" class="section glass-panel container" style="max-width: 600px; margin: 40px auto;">
+        <h2 class="section-title" style="text-align: center;">Contáctanos</h2>
+        <form id="contact-form">
+            <div class="form-group">
+                <label for="contact-name">Nombre</label>
+                <input type="text" id="contact-name" placeholder="Tu nombre completo">
+                <small class="error-text">Nombre requerido (mínimo 3 caracteres, solo letras).</small>
+            </div>
+            <div class="form-group">
+                <label for="contact-email">Correo Electrónico</label>
+                <input type="email" id="contact-email" placeholder="ejemplo@correo.com">
+                <small class="error-text">Por favor ingresa un correo válido.</small>
+            </div>
+            <div class="form-group">
+                <label for="contact-phone">Teléfono</label>
+                <input type="tel" id="contact-phone" placeholder="1234567890">
+                <small class="error-text">Teléfono requerido (de 7 a 15 dígitos numéricos).</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Enviar Mensaje</button>
+            <div id="contact-success" class="success-msg" style="display: none; margin-top: 15px; color: #4ade80;">Mensaje enviado correctamente!</div>
+        </form>
+    </section>
+
+    <!-- 10. Scroll infinito -->
+    <section id="infinite-scroll" class="section container">
+        <h2 class="section-title">Últimas Noticias</h2>
+        <div id="news-container" class="news-grid">
+            <!-- News items will be loaded here via JS -->
+            <div class="news-card glass-panel">
+                <h3>Lanzamiento del nuevo Smartphone Alpha</h3>
+                <p>Descubre todas las características de nuestro nuevo dispositivo estrella...</p>
+            </div>
+            <div class="news-card glass-panel">
+                <h3>TechFlow abre sus puertas</h3>
+                <p>Nuestra nueva plataforma online ya está disponible para todos...</p>
+            </div>
+        </div>
+        <div id="loading-spinner" class="spinner">Cargando más contenido...</div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 TechFlow. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
