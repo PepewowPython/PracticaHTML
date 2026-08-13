@@ -1,15 +1,115 @@
 /**
  * SISTEMA DE GESTIÓN DE RESTAURANTE "SABOR GOURMET"
  * Clases basadas en Programación Orientada a Objetos (POO)
- * Sigue la arquitectura definida en los diagramas de componentes y clases
  */
+
+// ======================== CLASE USUARIO ========================
+class Usuario {
+    constructor(id, nombre, username, email, password, rol = 'mesero') {
+        this.id = id;
+        this.nombre = nombre;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.rol = rol; // 'admin', 'mesero', 'chef', 'cajero'
+        this.activo = true;
+        this.fechaCreacion = new Date();
+    }
+
+    validarCredenciales(credencial, pass) {
+        const coincideUsuario = (this.username.toLowerCase() === credencial.toLowerCase() || 
+                           this.email.toLowerCase() === credencial.toLowerCase());
+        return coincideUsuario && this.password === pass && this.activo;
+    }
+
+    obtenerPermisos() {
+        const permisosPorRol = {
+            'admin': ['dashboard', 'mesas', 'pedidos', 'cocina', 'facturacion', 'clientes', 'usuarios', 'reportes', 'historial'],
+            'mesero': ['dashboard', 'mesas', 'pedidos', 'clientes'],
+            'chef': ['dashboard', 'cocina'],
+            'cajero': ['dashboard', 'pedidos', 'facturacion', 'clientes', 'reportes']
+        };
+        return permisosPorRol[this.rol] || ['dashboard'];
+    }
+
+    tienePermiso(modulo) {
+        return this.obtenerPermisos().includes(modulo);
+    }
+
+    obtenerInfo() {
+        return {
+            id: this.id,
+            nombre: this.nombre,
+            username: this.username,
+            email: this.email,
+            rol: this.rol,
+            activo: this.activo,
+            fechaCreacion: this.fechaCreacion
+        };
+    }
+}
+
+// ======================== CLASE CLIENTE ========================
+class Cliente {
+    constructor(id, nombre, documento, email, telefono, direccion = '') {
+        this.id = id;
+        this.nombre = nombre;
+        this.documento = documento;
+        this.email = email;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.fechaRegistro = new Date();
+        this.visitas = 1;
+    }
+
+    incrementarVisita() {
+        this.visitas++;
+    }
+
+    obtenerInfo() {
+        return {
+            id: this.id,
+            nombre: this.nombre,
+            documento: this.documento,
+            email: this.email,
+            telefono: this.telefono,
+            direccion: this.direccion,
+            visitas: this.visitas
+        };
+    }
+}
+
+// ======================== CLASE BITACORA / AUDITORIA ========================
+class BitacoraAudit {
+    static contador = 1;
+
+    constructor(usuario, accion, detalle) {
+        this.id = BitacoraAudit.contador++;
+        this.fecha = new Date();
+        this.usuario = usuario ? (usuario.nombre || usuario.username) : 'Sistema';
+        this.rol = usuario ? usuario.rol : 'Sistema';
+        this.accion = accion;
+        this.detalle = detalle;
+    }
+
+    obtenerDetalles() {
+        return {
+            id: this.id,
+            fecha: this.fecha.toLocaleString('es-ES'),
+            usuario: this.usuario,
+            rol: this.rol,
+            accion: this.accion,
+            detalle: this.detalle
+        };
+    }
+}
 
 // ======================== CLASE TRABAJADOR ========================
 class Trabajador {
     constructor(id, nombre, cargo, email, telefono, turno = 'mañana') {
         this.id = id;
         this.nombre = nombre;
-        this.cargo = cargo; // 'mesero', 'chef', 'cajero'
+        this.cargo = cargo;
         this.email = email;
         this.telefono = telefono;
         this.turno = turno;
@@ -50,7 +150,7 @@ class MenuItem {
         this.precio = parseFloat(precio);
         this.categoria = categoria;
         this.disponible = true;
-        this.preparacion = preparacion; // minutos
+        this.preparacion = preparacion;
     }
 
     obtenerPrecio() {
@@ -113,12 +213,14 @@ class DetallePedido {
 class Pedido {
     static contador = 1;
 
-    constructor(mesa) {
+    constructor(mesa, mesero = null, cliente = null) {
         this.id = Pedido.contador++;
         this.mesa = mesa;
+        this.mesero = mesero;
+        this.cliente = cliente;
         this.items = [];
         this.fecha = new Date();
-        this.estado = 'pendiente'; // 'pendiente', 'preparacion', 'listo', 'servido'
+        this.estado = 'pendiente';
         this.total = 0;
         this.observaciones = '';
     }
@@ -164,7 +266,9 @@ class Pedido {
     obtenerDetalles() {
         return {
             id: this.id,
-            mesa: this.mesa.numero,
+            mesa: this.mesa ? this.mesa.numero : 'N/A',
+            mesero: this.mesero ? (this.mesero.nombre || this.mesero) : 'Sin asignar',
+            cliente: this.cliente ? this.cliente.nombre : 'Consumidor Final',
             items: this.items.map(d => d.obtenerDetalles()),
             fecha: this.fecha.toLocaleString('es-ES'),
             estado: this.estado,
@@ -184,21 +288,24 @@ class Mesa {
         this.id = id;
         this.numero = numero;
         this.capacidad = capacidad;
-        this.estado = 'libre'; // 'libre', 'ocupada', 'reservada'
+        this.estado = 'libre';
         this.pedido = null;
         this.mesero = null;
+        this.cliente = null;
         this.horaOcupacion = null;
     }
 
-    ocupar(mesero) {
+    ocupar(mesero, cliente = null) {
         this.estado = 'ocupada';
         this.mesero = mesero;
+        this.cliente = cliente;
         this.horaOcupacion = new Date();
     }
 
     liberar() {
         this.estado = 'libre';
         this.mesero = null;
+        this.cliente = null;
         this.horaOcupacion = null;
         this.pedido = null;
     }
@@ -218,7 +325,7 @@ class Mesa {
     obtenerTiempoOcupacion() {
         if (!this.horaOcupacion) return 0;
         const ahora = new Date();
-        return Math.round((ahora - this.horaOcupacion) / 60000); // minutos
+        return Math.round((ahora - new Date(this.horaOcupacion)) / 60000);
     }
 
     cambiarEstado(nuevoEstado) {
@@ -231,7 +338,8 @@ class Mesa {
             numero: this.numero,
             capacidad: this.capacidad,
             estado: this.estado,
-            mesero: this.mesero ? this.mesero.nombre : 'Sin asignar',
+            mesero: this.mesero ? (this.mesero.nombre || this.mesero) : 'Sin asignar',
+            cliente: this.cliente ? this.cliente.nombre : 'Sin cliente',
             tiempoOcupacion: this.obtenerTiempoOcupacion(),
             tienePedido: this.pedido !== null
         };
@@ -242,39 +350,33 @@ class Mesa {
 class Factura {
     static contador = 1000;
 
-    constructor(pedido) {
+    constructor(pedido, cliente = null, propina = 0, descuento = 0, metodoPago = 'efectivo', cajero = 'Sistema') {
         this.id = Factura.contador++;
         this.pedido = pedido;
+        this.cliente = cliente || (pedido ? pedido.cliente : null);
         this.fecha = new Date();
-        this.subtotal = pedido.total;
-        this.impuesto = this.calcularImpuesto();
-        this.propina = 0;
-        this.total = this.subtotal + this.impuesto;
-        this.metodoPago = 'efectivo';
-    }
-
-    calcularImpuesto() {
-        const TASA_IVA = 0.19;
-        return parseFloat((this.subtotal * TASA_IVA).toFixed(2));
-    }
-
-    agregarPropina(monto) {
-        this.propina = parseFloat(monto);
-        this.total = this.subtotal + this.impuesto + this.propina;
-    }
-
-    cambiarMetodoPago(metodo) {
-        this.metodoPago = metodo;
+        this.subtotal = pedido ? pedido.total : 0;
+        this.descuento = parseFloat(descuento);
+        this.subtotalConDescuento = Math.max(0, this.subtotal - this.descuento);
+        this.impuesto = parseFloat((this.subtotalConDescuento * 0.19).toFixed(2));
+        this.propina = parseFloat(propina);
+        this.total = parseFloat((this.subtotalConDescuento + this.impuesto + this.propina).toFixed(2));
+        this.metodoPago = metodoPago;
+        this.cajero = cajero;
     }
 
     generarFactura() {
-        const detalles = this.pedido.obtenerDetalles();
+        const detalles = this.pedido ? this.pedido.obtenerDetalles() : { mesa: 'N/A', items: [] };
         return {
             numeroFactura: this.id,
             fecha: this.fecha.toLocaleString('es-ES'),
             mesa: detalles.mesa,
+            cliente: this.cliente ? this.cliente.nombre : 'Consumidor Final',
+            documentoCliente: this.cliente ? (this.cliente.documento || 'N/A') : 'N/A',
+            cajero: this.cajero,
             items: detalles.items,
             subtotal: this.subtotal,
+            descuento: this.descuento,
             iva: this.impuesto,
             propina: this.propina,
             total: this.total,
@@ -322,7 +424,8 @@ class Reporte {
     ventasPorHora() {
         const ventas = new Map();
         this.pedidos.forEach(pedido => {
-            const hora = pedido.fecha.getHours() + ':00';
+            const fecha = new Date(pedido.fecha);
+            const hora = fecha.getHours() + ':00';
             const cantidad = ventas.get(hora) || 0;
             ventas.set(hora, cantidad + 1);
         });
@@ -333,7 +436,7 @@ class Reporte {
         const contador = {};
         this.pedidos.forEach(pedido => {
             pedido.items.forEach(detalle => {
-                const nombre = detalle.menuItem.nombre;
+                const nombre = detalle.menuItem ? detalle.menuItem.nombre : (detalle.item || 'Producto');
                 contador[nombre] = (contador[nombre] || 0) + detalle.cantidad;
             });
         });
@@ -379,7 +482,7 @@ class Reporte {
 class Restaurante {
     static instancia = null;
 
-    constructor(nombre = 'Sabor Gourmet', direccion = '', telefono = '') {
+    constructor(nombre = 'Sabor Gourmet', direccion = 'Calle Principal #45-12', telefono = '555-9000') {
         if (Restaurante.instancia) {
             return Restaurante.instancia;
         }
@@ -390,8 +493,12 @@ class Restaurante {
         this.mesas = [];
         this.menu = [];
         this.trabajadores = [];
+        this.usuarios = [];
+        this.clientes = [];
         this.pedidos = [];
         this.facturas = [];
+        this.auditoria = [];
+        this.usuarioActual = null;
         this.reporteActual = new Reporte();
 
         Restaurante.instancia = this;
@@ -402,6 +509,37 @@ class Restaurante {
             new Restaurante();
         }
         return Restaurante.instancia;
+    }
+
+    registrarLog(accion, detalle) {
+        const log = new BitacoraAudit(this.usuarioActual, accion, detalle);
+        this.auditoria.unshift(log);
+    }
+
+    autenticar(credencial, password) {
+        const usuarioEncontrado = this.usuarios.find(u => u.validarCredenciales(credencial, password));
+        if (usuarioEncontrado) {
+            this.usuarioActual = usuarioEncontrado;
+            this.registrarLog('Inicio de Sesión', `El usuario ${usuarioEncontrado.username} ha iniciado sesión`);
+            return { exito: true, usuario: usuarioEncontrado };
+        }
+        return { exito: false, mensaje: 'Credenciales inválidas o usuario inactivo' };
+    }
+
+    cerrarSesion() {
+        if (this.usuarioActual) {
+            this.registrarLog('Cierre de Sesión', `El usuario ${this.usuarioActual.username} ha cerrado sesión`);
+        }
+        this.usuarioActual = null;
+    }
+
+    recuperarPassword(correo) {
+        const u = this.usuarios.find(user => user.email.toLowerCase() === correo.toLowerCase());
+        if (u) {
+            this.registrarLog('Solicitud Contraseña', `Solicitud de recuperación para ${correo}`);
+            return { exito: true, contraseñaTemporal: u.password, mensaje: `Instrucciones enviadas a ${correo}. Tu clave actual es: ${u.password}` };
+        }
+        return { exito: false, mensaje: 'El correo ingresado no se encuentra registrado' };
     }
 
     agregarMesa(mesa) {
@@ -416,6 +554,16 @@ class Restaurante {
         this.trabajadores.push(trabajador);
     }
 
+    agregarUsuario(usuario) {
+        this.usuarios.push(usuario);
+        this.registrarLog('Usuario Creado', `Se creó el usuario ${usuario.username} con rol ${usuario.rol}`);
+    }
+
+    agregarCliente(cliente) {
+        this.clientes.push(cliente);
+        this.registrarLog('Cliente Registrado', `Se registró al cliente ${cliente.nombre} (${cliente.documento})`);
+    }
+
     obtenerMesa(id) {
         return this.mesas.find(m => m.id === id);
     }
@@ -424,16 +572,25 @@ class Restaurante {
         return this.menu;
     }
 
-    crearPedido(mesa) {
-        const pedido = new Pedido(mesa);
+    crearPedido(mesa, mesero = null, cliente = null) {
+        const meseroAsignado = mesero || (this.usuarioActual ? this.usuarioActual.nombre : 'Mesero General');
+        const pedido = new Pedido(mesa, meseroAsignado, cliente);
         this.pedidos.push(pedido);
+        this.registrarLog('Pedido Creado', `Pedido #${pedido.id} creado para Mesa ${mesa ? mesa.numero : 'N/A'}`);
         return pedido;
     }
 
-    crearFactura(pedido) {
-        const factura = new Factura(pedido);
+    crearFactura(pedido, cliente = null, propina = 0, descuento = 0, metodoPago = 'efectivo') {
+        const cajero = this.usuarioActual ? this.usuarioActual.nombre : 'Cajero General';
+        const factura = new Factura(pedido, cliente, propina, descuento, metodoPago, cajero);
         this.facturas.push(factura);
         this.reporteActual.agregarFactura(factura);
+        
+        if (pedido && pedido.mesa) {
+            pedido.mesa.liberar();
+        }
+
+        this.registrarLog('Factura Emitida', `Factura #${factura.id} emitida por $${factura.total} - Método: ${metodoPago}`);
         return factura;
     }
 
@@ -460,14 +617,18 @@ class Restaurante {
     }
 
     limpiarDatos() {
-        // Método para limpiar datos de demostración
         this.mesas = [];
         this.menu = [];
         this.trabajadores = [];
+        this.usuarios = [];
+        this.clientes = [];
         this.pedidos = [];
         this.facturas = [];
+        this.auditoria = [];
+        this.usuarioActual = null;
         this.reporteActual = new Reporte();
         Pedido.contador = 1;
         Factura.contador = 1000;
+        BitacoraAudit.contador = 1;
     }
 }

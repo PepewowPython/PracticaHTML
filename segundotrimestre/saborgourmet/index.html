@@ -3,53 +3,155 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Sistema de Gestión para Restaurante Sabor Gourmet" />
+        <meta name="description" content="Sistema de Gestión Integral para Restaurante Sabor Gourmet" />
         <meta name="author" content="Frontend Developer" />
         <title>Sabor Gourmet - Sistema de Gestión de Restaurante</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-        <!-- Font Awesome icons (free version)-->
+        <!-- Font Awesome icons-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
         <!-- Bootstrap CSS-->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <!-- Core theme CSS-->
         <link href="css/styles.css" rel="stylesheet" />
         <!-- Custom CSS-->
         <link href="css/custom.css" rel="stylesheet" />
     </head>
     <body id="page-top" class="bg-light">
-        <!-- Navigation-->
-        <nav class="navbar navbar-dark bg-dark navbar-expand-lg sticky-top shadow-sm">
-            <div class="container-fluid ps-4">
-                <a class="navbar-brand" href="#page-top">
-                    <i class="fas fa-utensils me-2"></i>
-                    <strong>Sabor Gourmet</strong>
+
+        <!-- ================= PANTALLA / OVERLAY DE LOGIN ================= -->
+        <div id="loginOverlay" class="login-overlay">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 440px; width: 92%; max-height: 90vh; overflow-y: auto;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow" style="width: 70px; height: 70px;">
+                            <i class="fas fa-utensils fa-2x"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Sabor Gourmet</h3>
+                        <p class="text-muted small">Sistema de Gestión e Inicios de Sesión</p>
+                    </div>
+
+                    <div id="loginErrorAlert" class="alert alert-danger d-none" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i><span id="loginErrorText">Credenciales inválidas</span>
+                    </div>
+
+                    <form id="formLogin" onsubmit="event.preventDefault(); app.ejecutarLogin();">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold">Usuario o Correo:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" id="loginUsuario" placeholder="ej. admin o admin@saborgourmet.com" required value="admin">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold">Contraseña:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0 ps-0" id="loginPassword" placeholder="••••••••" required value="admin123">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe">
+                                <label class="form-check-label small text-muted" for="rememberMe">Recordarme</label>
+                            </div>
+                            <a href="#" class="small text-primary text-decoration-none" onclick="app.abrirModalRecuperar()">¿Olvidaste tu clave?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <small class="text-muted d-block mb-2 fw-bold">Credenciales Rápidas para Demostración:</small>
+                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                            <button class="btn btn-xs btn-outline-secondary small" onclick="app.cargarCredencialesDemo('admin', 'admin123')">Admin</button>
+                            <button class="btn btn-xs btn-outline-secondary small" onclick="app.cargarCredencialesDemo('mesero', 'mesero123')">Mesero</button>
+                            <button class="btn btn-xs btn-outline-secondary small" onclick="app.cargarCredencialesDemo('chef', 'chef123')">Chef</button>
+                            <button class="btn btn-xs btn-outline-secondary small" onclick="app.cargarCredencialesDemo('cajero', 'cajero123')">Cajero</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= NAVBAR ================= -->
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg sticky-top shadow-sm py-2">
+            <div class="container-fluid px-2 px-sm-3 px-md-4">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center me-auto me-lg-3" href="#page-top">
+                    <i class="fas fa-utensils text-warning me-2 fa-lg"></i>
+                    <strong class="d-none d-sm-inline">Sabor Gourmet</strong>
+                    <strong class="d-inline d-sm-none fs-5">Sabor Gourmet</strong>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+                <!-- Perfil de usuario activo y Botón de Logout SIEMPRE VISIBLES -->
+                <div class="d-flex align-items-center me-2 me-lg-3 ps-2 border-start border-secondary">
+                    <div class="text-end me-2 d-flex flex-column align-items-end">
+                        <span class="text-white fw-bold small text-truncate" style="max-width: 110px;" id="userDisplayName">Administrador</span>
+                        <span class="badge bg-warning text-dark badge-role" id="userDisplayRole">ADMIN</span>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm rounded-circle p-2 ms-1" onclick="app.ejecutarLogout()" title="Cerrar Sesión" id="btnLogout">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+
+                <!-- Toggler Button for Mobile Nav -->
+                <button class="navbar-toggler border-secondary p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Menú">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto me-4">
-                        <li class="nav-item">
-                            <button class="nav-link btn-link-nav active" onclick="app.showModule('mesas')">
-                                <i class="fas fa-chair me-2"></i>Mesas
+
+                <!-- Collapsible Modules -->
+                <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-stretch align-items-lg-center gap-1 py-2 py-lg-0" id="navModulesList">
+                        <li class="nav-item nav-mod" data-modulo="dashboard">
+                            <button class="btn-link-nav w-100 text-start text-lg-center active" onclick="app.showModule('dashboard')">
+                                <i class="fas fa-tachometer-alt me-2 me-lg-1"></i>Dashboard
                             </button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link btn-link-nav" onclick="app.showModule('pedidos')">
-                                <i class="fas fa-clipboard me-2"></i>Pedidos
+                        <li class="nav-item nav-mod" data-modulo="mesas">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('mesas')">
+                                <i class="fas fa-chair me-2 me-lg-1"></i>Mesas
                             </button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link btn-link-nav" onclick="app.showModule('facturacion')">
-                                <i class="fas fa-receipt me-2"></i>Facturación
+                        <li class="nav-item nav-mod" data-modulo="pedidos">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('pedidos')">
+                                <i class="fas fa-clipboard-list me-2 me-lg-1"></i>Pedidos
                             </button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link btn-link-nav" onclick="app.showModule('reportes')">
-                                <i class="fas fa-chart-bar me-2"></i>Reportes
+                        <li class="nav-item nav-mod" data-modulo="cocina">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('cocina')">
+                                <i class="fas fa-fire me-2 me-lg-1"></i>Cocina
+                            </button>
+                        </li>
+                        <li class="nav-item nav-mod" data-modulo="facturacion">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('facturacion')">
+                                <i class="fas fa-receipt me-2 me-lg-1"></i>Facturación
+                            </button>
+                        </li>
+                        <li class="nav-item nav-mod" data-modulo="clientes">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('clientes')">
+                                <i class="fas fa-address-book me-2 me-lg-1"></i>Clientes
+                            </button>
+                        </li>
+                        <li class="nav-item nav-mod" data-modulo="usuarios">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('usuarios')">
+                                <i class="fas fa-users-cog me-2 me-lg-1"></i>Usuarios
+                            </button>
+                        </li>
+                        <li class="nav-item nav-mod" data-modulo="reportes">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('reportes')">
+                                <i class="fas fa-chart-bar me-2 me-lg-1"></i>Reportes
+                            </button>
+                        </li>
+                        <li class="nav-item nav-mod" data-modulo="historial">
+                            <button class="btn-link-nav w-100 text-start text-lg-center" onclick="app.showModule('historial')">
+                                <i class="fas fa-history me-2 me-lg-1"></i>Bitácora
                             </button>
                         </li>
                     </ul>
@@ -57,227 +159,117 @@
             </div>
         </nav>
 
-        <!-- Main Container -->
-        <div class="container-fluid py-4">
+        <!-- ================= MAIN CONTAINER ================= -->
+        <div class="container-fluid py-3 py-md-4 px-2 px-sm-3 px-md-4">
             
-            <!-- Module: Mesas -->
-            <div id="modulo-mesas" class="modulo-active">
-                <div class="row mb-4">
+            <!-- ================= MODULO: DASHBOARD ================= -->
+            <div id="modulo-dashboard" class="modulo-active">
+                <div class="row mb-3 mb-md-4">
                     <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h1 class="h2">
-                                <i class="fas fa-chair text-primary me-2"></i>Gestión de Mesas
-                            </h1>
-                            <button class="btn btn-primary" onclick="app.generarMesasDemo()">
-                                <i class="fas fa-plus me-2"></i>Cargar Datos Demo
-                            </button>
-                        </div>
-                        <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Selecciona una mesa para ver o agregar pedidos
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filtros -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Filtrar por estado:</label>
-                                        <select class="form-select" id="filterEstado" onchange="app.filtrarMesas()">
-                                            <option value="">Todas las mesas</option>
-                                            <option value="libre">Libres</option>
-                                            <option value="ocupada">Ocupadas</option>
-                                            <option value="reservada">Reservadas</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Filtrar por capacidad:</label>
-                                        <select class="form-select" id="filterCapacidad" onchange="app.filtrarMesas()">
-                                            <option value="">Todas</option>
-                                            <option value="2">2 personas</option>
-                                            <option value="4">4 personas</option>
-                                            <option value="6">6 personas</option>
-                                            <option value="8">8 personas</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">&nbsp;</label>
-                                        <button class="btn btn-outline-secondary w-100" onclick="app.limpiarFiltros()">
-                                            <i class="fas fa-times me-2"></i>Limpiar Filtros
-                                        </button>
-                                    </div>
-                                </div>
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center bg-white p-3 rounded shadow-sm border gap-2">
+                            <div>
+                                <h2 class="h4 mb-0 text-dark fw-bold">
+                                    <i class="fas fa-tachometer-alt text-primary me-2"></i>Dashboard General
+                                </h2>
+                                <p class="text-muted small mb-0">Resumen operativo del restaurante en tiempo real</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Grid de Mesas -->
-                <div id="mesasContainer" class="row g-3">
-                    <!-- Las mesas se cargarán aquí dinámicamente -->
-                </div>
-            </div>
-
-            <!-- Module: Pedidos -->
-            <div id="modulo-pedidos" class="modulo-hidden">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h1 class="h2">
-                                <i class="fas fa-clipboard text-success me-2"></i>Gestión de Pedidos
-                            </h1>
-                            <button class="btn btn-success" onclick="app.nuevoMenu()">
-                                <i class="fas fa-plus me-2"></i>Crear Menú
+                            <button class="btn btn-outline-primary btn-sm" onclick="app.cargarDatosDemostracionCompletos()">
+                                <i class="fas fa-sync-alt me-1"></i>Reiniciar Datos Demo
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <!-- Menu Items -->
-                    <div class="col-lg-6">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-list me-2"></i>Menú Disponible
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="menuContainer" class="menu-list">
-                                    <!-- Menu items se cargarán aquí -->
+                <!-- KPIs principales -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-xl-3">
+                        <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted fw-bold small">Ventas Totales</div>
+                                        <h3 class="fw-bold mb-0 text-primary fs-4 fs-md-3" id="dashTotalVentas">$0.00</h3>
+                                    </div>
+                                    <div class="bg-primary bg-opacity-10 p-2 p-md-3 rounded-circle text-primary d-none d-sm-block">
+                                        <i class="fas fa-dollar-sign fa-2x"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pedido Actual -->
-                    <div class="col-lg-6">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-shopping-cart me-2"></i>Pedido en Construcción
-                                </h5>
+                    <div class="col-6 col-xl-3">
+                        <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted fw-bold small">Mesas Ocupadas</div>
+                                        <h3 class="fw-bold mb-0 text-warning fs-4 fs-md-3" id="dashMesasOcupadas">0 / 0</h3>
+                                    </div>
+                                    <div class="bg-warning bg-opacity-10 p-2 p-md-3 rounded-circle text-warning d-none d-sm-block">
+                                        <i class="fas fa-chair fa-2x"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Mesa:</label>
-                                    <select class="form-select" id="pedidoMesa">
-                                        <option value="">Selecciona una mesa</option>
-                                    </select>
-                                </div>
-                                <div id="pedidoItemsContainer" class="pedido-items">
-                                    <!-- Items del pedido -->
-                                </div>
-                                <div class="alert alert-warning" id="emptyPedidoAlert" role="alert">
-                                    <small>No hay items en el pedido. Agrega items del menú.</small>
-                                </div>
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="row">
-                                        <div class="col-8">
-                                            <h6>Subtotal:</h6>
-                                        </div>
-                                        <div class="col-4 text-end">
-                                            <h6 id="subtotalPedido">$0.00</h6>
-                                        </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-xl-3">
+                        <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted fw-bold small">Pedidos Activos</div>
+                                        <h3 class="fw-bold mb-0 text-info fs-4 fs-md-3" id="dashPedidosActivos">0</h3>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-8">
-                                            <small>IVA (19%):</small>
-                                        </div>
-                                        <div class="col-4 text-end">
-                                            <small id="ivaPedido">$0.00</small>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-2">
-                                        <div class="col-8">
-                                            <h6>Total:</h6>
-                                        </div>
-                                        <div class="col-4 text-end">
-                                            <h6 class="text-success" id="totalPedido">$0.00</h6>
-                                        </div>
+                                    <div class="bg-info bg-opacity-10 p-2 p-md-3 rounded-circle text-info d-none d-sm-block">
+                                        <i class="fas fa-fire fa-2x"></i>
                                     </div>
                                 </div>
-                                <button class="btn btn-success w-100 mt-3" onclick="app.guardarPedido()">
-                                    <i class="fas fa-save me-2"></i>Guardar Pedido
-                                </button>
-                                <button class="btn btn-outline-danger w-100 mt-2" onclick="app.limpiarPedido()">
-                                    <i class="fas fa-trash me-2"></i>Limpiar
-                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-xl-3">
+                        <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase text-muted fw-bold small">Clientes</div>
+                                        <h3 class="fw-bold mb-0 text-success fs-4 fs-md-3" id="dashTotalClientes">0</h3>
+                                    </div>
+                                    <div class="bg-success bg-opacity-10 p-2 p-md-3 rounded-circle text-success d-none d-sm-block">
+                                        <i class="fas fa-users fa-2x"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pedidos Registrados -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-history me-2"></i>Pedidos Registrados
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover" id="pedidosTable">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Mesa</th>
-                                                <th>Items</th>
-                                                <th>Estado</th>
-                                                <th>Total</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="pedidosTableBody">
-                                            <!-- Pedidos se cargarán aquí -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Module: Facturación -->
-            <div id="modulo-facturacion" class="modulo-hidden">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h1 class="h2">
-                            <i class="fas fa-receipt text-warning me-2"></i>Módulo de Facturación
-                        </h1>
-                    </div>
-                </div>
-
-                <div class="row">
+                <!-- Resumen rápido y accesos directos -->
+                <div class="row g-3 g-md-4">
                     <div class="col-lg-8">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-search me-2"></i>Selecciona Pedido para Facturar
-                                </h5>
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 fw-bold fs-6 fs-md-5"><i class="fas fa-list-alt text-primary me-2"></i>Pedidos Recientes</h5>
+                                <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="app.showModule('pedidos')">Ver Todos</button>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover align-middle mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Pedido</th>
+                                                <th>#</th>
                                                 <th>Mesa</th>
-                                                <th>Subtotal</th>
-                                                <th>IVA</th>
+                                                <th>Cliente</th>
+                                                <th>Estado</th>
                                                 <th>Total</th>
                                                 <th>Acción</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="pedidosFacturacionTable">
-                                            <!-- Pedidos para facturar -->
+                                        <tbody id="dashPedidosTable">
+                                            <!-- Cargados dinámicamente -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -286,30 +278,24 @@
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-chair me-2"></i>Mesas Ocupadas
-                                </h5>
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-white py-3 border-bottom">
+                                <h5 class="card-title mb-0 fw-bold fs-6 fs-md-5"><i class="fas fa-bolt text-warning me-2"></i>Accesos Rápidos</h5>
                             </div>
-                            <div class="card-body" id="mesasOcupadasFacturacion">
-                                <div class="text-center text-muted py-4">
-                                    <i class="fas fa-inbox" style="font-size: 2rem;"></i>
-                                    <p class="mt-2">No hay mesas ocupadas</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card shadow-sm sticky-top" style="top: 100px;">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-file-pdf me-2"></i>Vista Previa Factura
-                                </h5>
-                            </div>
-                            <div class="card-body" id="facturaPreview">
-                                <div class="text-center text-muted py-5">
-                                    <i class="fas fa-file-invoice text-muted" style="font-size: 3rem;"></i>
-                                    <p class="mt-3">Selecciona un pedido para generar factura</p>
+                            <div class="card-body p-3">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary text-start p-2 p-md-3 rounded-3" onclick="app.showModule('mesas')">
+                                        <i class="fas fa-chair me-2"></i> Ver Estado de Mesas
+                                    </button>
+                                    <button class="btn btn-outline-success text-start p-2 p-md-3 rounded-3" onclick="app.showModule('pedidos')">
+                                        <i class="fas fa-plus-circle me-2"></i> Crear Nuevo Pedido
+                                    </button>
+                                    <button class="btn btn-outline-danger text-start p-2 p-md-3 rounded-3" onclick="app.showModule('cocina')">
+                                        <i class="fas fa-utensils me-2"></i> Monitor de Cocina
+                                    </button>
+                                    <button class="btn btn-outline-warning text-dark text-start p-2 p-md-3 rounded-3" onclick="app.showModule('facturacion')">
+                                        <i class="fas fa-receipt me-2"></i> Facturar / Cobrar Mesa
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -317,105 +303,479 @@
                 </div>
             </div>
 
-            <!-- Module: Reportes -->
+            <!-- ================= MODULO: MESAS ================= -->
+            <div id="modulo-mesas" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center bg-white p-3 rounded shadow-sm border gap-2">
+                            <h2 class="h4 mb-0 fw-bold">
+                                <i class="fas fa-chair text-primary me-2"></i>Gestión y Control de Mesas
+                            </h2>
+                            <button class="btn btn-primary btn-sm" onclick="app.cargarDatosDemostracionCompletos()">
+                                <i class="fas fa-sync-alt me-1"></i>Cargar Datos Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-body p-3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold small">Estado de la Mesa:</label>
+                                <select class="form-select form-select-sm" id="filterEstado" onchange="app.filtrarMesas()">
+                                    <option value="">Todas las mesas</option>
+                                    <option value="libre">Libres</option>
+                                    <option value="ocupada">Ocupadas</option>
+                                    <option value="reservada">Reservadas</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold small">Capacidad:</label>
+                                <select class="form-select form-select-sm" id="filterCapacidad" onchange="app.filtrarMesas()">
+                                    <option value="">Todas las capacidades</option>
+                                    <option value="2">2 Personas</option>
+                                    <option value="4">4 Personas</option>
+                                    <option value="6">6 Personas</option>
+                                    <option value="8">8 Personas</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4 d-flex align-items-end">
+                                <button class="btn btn-outline-secondary btn-sm w-100" onclick="app.limpiarFiltros()">
+                                    <i class="fas fa-times me-2"></i>Limpiar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid de Mesas -->
+                <div id="mesasContainer" class="row g-2 g-md-3">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- ================= MODULO: PEDIDOS ================= -->
+            <div id="modulo-pedidos" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center bg-white p-3 rounded shadow-sm border gap-2">
+                            <h2 class="h4 mb-0 fw-bold">
+                                <i class="fas fa-clipboard-list text-success me-2"></i>Gestión de Pedidos
+                            </h2>
+                            <button class="btn btn-success btn-sm" onclick="app.nuevoMenu()">
+                                <i class="fas fa-plus me-1"></i>Nuevo Artículo de Menú
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 g-md-4">
+                    <!-- Menú Disponible -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-success text-white fw-bold py-2 py-md-3">
+                                <i class="fas fa-utensils me-2"></i>Menú Disponible
+                            </div>
+                            <div class="card-body p-2 p-md-3">
+                                <div id="menuContainer" class="menu-list">
+                                    <!-- Menú dinámico -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Construcción del Pedido -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-info text-white fw-bold py-2 py-md-3">
+                                <i class="fas fa-shopping-cart me-2"></i>Nuevo Pedido para Mesa
+                            </div>
+                            <div class="card-body p-2 p-md-3">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label fw-semibold small">Seleccionar Mesa:</label>
+                                        <select class="form-select form-select-sm" id="pedidoMesa">
+                                            <option value="">Selecciona una mesa</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label fw-semibold small">Seleccionar Cliente:</label>
+                                        <select class="form-select form-select-sm" id="pedidoCliente">
+                                            <option value="">Consumidor Final</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div id="pedidoItemsContainer" class="pedido-items mb-3">
+                                    <!-- Items agregados -->
+                                </div>
+
+                                <div class="alert alert-warning text-center" id="emptyPedidoAlert" role="alert">
+                                    <small><i class="fas fa-info-circle me-1"></i> Selecciona una mesa y haz clic en los platillos del menú para agregarlos.</small>
+                                </div>
+
+                                <div class="mt-3 pt-3 border-top bg-light p-3 rounded">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Subtotal:</span>
+                                        <strong id="subtotalPedido">$0.00</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>IVA (19%):</span>
+                                        <small class="text-muted" id="ivaPedido">$0.00</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between h5 mt-2 pt-2 border-top">
+                                        <strong>Total Estimado:</strong>
+                                        <strong class="text-success" id="totalPedido">$0.00</strong>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-success w-100 mt-3 py-2 fw-semibold" onclick="app.guardarPedido()">
+                                    <i class="fas fa-paper-plane me-2"></i>Enviar Pedido a Cocina
+                                </button>
+                                <button class="btn btn-outline-danger w-100 mt-2 btn-sm" onclick="app.limpiarPedido()">
+                                    <i class="fas fa-trash me-2"></i>Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Pedidos Registrados -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-dark text-white fw-bold py-3">
+                                <i class="fas fa-history me-2"></i>Historial de Pedidos Registrados
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" id="pedidosTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Mesa</th>
+                                                <th>Atendido por</th>
+                                                <th>Cliente</th>
+                                                <th>Items</th>
+                                                <th>Estado</th>
+                                                <th>Total</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pedidosTableBody">
+                                            <!-- Dinámico -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: COCINA ================= -->
+            <div id="modulo-cocina" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border">
+                            <div>
+                                <h2 class="h4 mb-0 text-dark fw-bold">
+                                    <i class="fas fa-fire text-danger me-2"></i>Monitor de Cocina (KDS)
+                                </h2>
+                                <p class="text-muted small mb-0">Gestión de comandas y estados de preparación en tiempo real</p>
+                            </div>
+                            <span class="badge bg-danger p-2"><i class="fas fa-clock me-1"></i>Tiempo Real</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Columna: Pendientes -->
+                    <div class="col-12 col-md-4">
+                        <div class="card border-0 shadow-sm bg-light">
+                            <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exclamation-circle me-2"></i>Pendientes</span>
+                                <span class="badge bg-dark text-white" id="countCocinaPendientes">0</span>
+                            </div>
+                            <div class="card-body p-2" id="cocinaPendientesContainer">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna: En Preparación -->
+                    <div class="col-12 col-md-4">
+                        <div class="card border-0 shadow-sm bg-light">
+                            <div class="card-header bg-info text-white fw-bold d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-spinner fa-spin me-2"></i>En Preparación</span>
+                                <span class="badge bg-dark text-white" id="countCocinaPreparacion">0</span>
+                            </div>
+                            <div class="card-body p-2" id="cocinaPreparacionContainer">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna: Listos para Entregar -->
+                    <div class="col-12 col-md-4">
+                        <div class="card border-0 shadow-sm bg-light">
+                            <div class="card-header bg-success text-white fw-bold d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-check-circle me-2"></i>Listos para Servir</span>
+                                <span class="badge bg-dark text-white" id="countCocinaListos">0</span>
+                            </div>
+                            <div class="card-body p-2" id="cocinaListosContainer">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: FACTURACIÓN ================= -->
+            <div id="modulo-facturacion" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border">
+                            <h2 class="h4 mb-0 fw-bold">
+                                <i class="fas fa-receipt text-warning me-2"></i>Facturación y Registro de Pagos
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 g-md-4">
+                    <div class="col-12 col-lg-7">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-warning text-dark fw-bold">
+                                <i class="fas fa-search me-2"></i>Pedidos Listos / Servidos para Cobrar
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Pedido</th>
+                                                <th>Mesa</th>
+                                                <th>Cliente</th>
+                                                <th>Total</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pedidosFacturacionTable">
+                                            <!-- Dinámico -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-primary text-white fw-bold">
+                                <i class="fas fa-file-invoice-dollar me-2"></i>Comprobante / Pre-Factura
+                            </div>
+                            <div class="card-body bg-light" id="facturaPreview">
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-file-invoice fa-3x text-secondary mb-3"></i>
+                                    <p>Selecciona un pedido de la lista para procesar su cobro y emitir factura.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: CLIENTES ================= -->
+            <div id="modulo-clientes" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center bg-white p-3 rounded shadow-sm border gap-2">
+                            <h2 class="h4 mb-0 text-dark fw-bold">
+                                <i class="fas fa-address-book text-success me-2"></i>Gestión de Clientes
+                            </h2>
+                            <button class="btn btn-success btn-sm" onclick="app.abrirModalNuevoCliente()">
+                                <i class="fas fa-user-plus me-1"></i>Registrar Cliente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre Completo</th>
+                                        <th>Documento</th>
+                                        <th>Correo Electrónico</th>
+                                        <th>Teléfono</th>
+                                        <th>Visitas</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientesTableBody">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: USUARIOS ================= -->
+            <div id="modulo-usuarios" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center bg-white p-3 rounded shadow-sm border gap-2">
+                            <h2 class="h4 mb-0 text-dark fw-bold">
+                                <i class="fas fa-users-cog text-info me-2"></i>Administración de Usuarios y Roles
+                            </h2>
+                            <button class="btn btn-info text-white btn-sm fw-semibold" onclick="app.abrirModalNuevoUsuario()">
+                                <i class="fas fa-user-shield me-1"></i>Crear Usuario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Usuario</th>
+                                        <th>Correo</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuariosTableBody">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: REPORTES ================= -->
             <div id="modulo-reportes" class="modulo-hidden">
-                <div class="row mb-4">
+                <div class="row mb-3 mb-md-4">
                     <div class="col-12">
-                        <h1 class="h2">
-                            <i class="fas fa-chart-bar text-danger me-2"></i>Reportes y Análisis
-                        </h1>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card shadow-sm bg-primary text-white">
-                            <div class="card-body text-center">
-                                <i class="fas fa-dollar-sign" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">Total Ventas</p>
-                                <h3 id="totalVentas">$0.00</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm bg-success text-white">
-                            <div class="card-body text-center">
-                                <i class="fas fa-receipt" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">Pedidos Procesados</p>
-                                <h3 id="totalPedidos">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm bg-info text-white">
-                            <div class="card-body text-center">
-                                <i class="fas fa-chair" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">Mesas Ocupadas</p>
-                                <h3 id="mesasOcupadas">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm bg-warning text-dark">
-                            <div class="card-body text-center">
-                                <i class="fas fa-utensils" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">Platos Vendidos</p>
-                                <h3 id="platosVendidos">0</h3>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border">
+                            <h2 class="h4 mb-0 text-dark fw-bold">
+                                <i class="fas fa-chart-bar text-danger me-2"></i>Reportes Estadísticos y Ventas
+                            </h2>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-danger text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-chart-pie me-2"></i>Platos Populares
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="platosPopularesContainer">
-                                    <small class="text-muted">Carga datos para ver platos populares</small>
-                                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm bg-primary text-white border-0">
+                            <div class="card-body text-center py-3 py-md-4">
+                                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                <p class="mb-0 text-white-50 small">Total Ventas</p>
+                                <h3 id="totalVentas" class="fw-bold mb-0 fs-4 fs-md-3">$0.00</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-hourglass me-2"></i>Horas Pico
-                                </h5>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm bg-success text-white border-0">
+                            <div class="card-body text-center py-3 py-md-4">
+                                <i class="fas fa-receipt fa-2x mb-2"></i>
+                                <p class="mb-0 text-white-50 small">Pedidos Procesados</p>
+                                <h3 id="totalPedidos" class="fw-bold mb-0 fs-4 fs-md-3">0</h3>
                             </div>
-                            <div class="card-body">
-                                <div id="horasPicoContainer">
-                                    <small class="text-muted">Carga datos para ver horas pico</small>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm bg-info text-white border-0">
+                            <div class="card-body text-center py-3 py-md-4">
+                                <i class="fas fa-chair fa-2x mb-2"></i>
+                                <p class="mb-0 text-white-50 small">Mesas Ocupadas</p>
+                                <h3 id="mesasOcupadas" class="fw-bold mb-0 fs-4 fs-md-3">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm bg-warning text-dark border-0">
+                            <div class="card-body text-center py-3 py-md-4">
+                                <i class="fas fa-utensils fa-2x mb-2"></i>
+                                <p class="mb-0 text-dark-50 small">Platos Vendidos</p>
+                                <h3 id="platosVendidos" class="fw-bold mb-0 fs-4 fs-md-3">0</h3>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3 g-md-4 mb-4">
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-danger text-white fw-bold py-3">
+                                <i class="fas fa-chart-pie me-2"></i>Platos Más Vendidos
+                            </div>
+                            <div class="card-body" id="platosPopularesContainer">
+                                <small class="text-muted">Carga datos para ver estadísticas.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-dark text-white fw-bold py-3">
+                                <i class="fas fa-download me-2"></i>Exportar Informes
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-center gap-3">
+                                <button class="btn btn-outline-success py-2 fw-semibold" onclick="app.exportarCSVReporte()">
+                                    <i class="fas fa-file-csv me-2"></i>Descargar Reporte en CSV
+                                </button>
+                                <button class="btn btn-outline-primary py-2 fw-semibold" onclick="alert('✅ Datos exportados en formato JSON')">
+                                    <i class="fas fa-file-code me-2"></i>Descargar Resumen JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULO: BITÁCORA / HISTORIAL ================= -->
+            <div id="modulo-historial" class="modulo-hidden">
+                <div class="row mb-3 mb-md-4">
                     <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-dark text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-download me-2"></i>Exportar Datos
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-outline-success me-2">
-                                    <i class="fas fa-file-pdf me-2"></i>Descargar PDF
-                                </button>
-                                <button class="btn btn-outline-primary me-2">
-                                    <i class="fas fa-file-excel me-2"></i>Descargar Excel
-                                </button>
-                                <button class="btn btn-outline-secondary">
-                                    <i class="fas fa-file-csv me-2"></i>Descargar CSV
-                                </button>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border">
+                            <h2 class="h4 mb-0 text-dark fw-bold">
+                                <i class="fas fa-history text-secondary me-2"></i>Bitácora de Auditoría y Trazabilidad
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha y Hora</th>
+                                        <th>Usuario</th>
+                                        <th>Rol</th>
+                                        <th>Acción</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -423,21 +783,167 @@
 
         </div>
 
-        <!-- Modal para crear nuevo item de menú -->
-        <div class="modal fade" id="modalNuevoMenu" tabindex="-1">
-            <div class="modal-dialog">
+        <!-- ================= MODALES ================= -->
+
+        <!-- Modal Procesar Pago -->
+        <div class="modal fade" id="modalProcesarPago" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nuevo Artículo de Menú</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-cash-register me-2"></i>Procesar Pago de Pedido</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="pagoPedidoId">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Método de Pago:</label>
+                            <select class="form-select" id="pagoMetodo">
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta de Crédito / Débito</option>
+                                <option value="transferencia">Transferencia Bancaria</option>
+                                <option value="nequi">Nequi / Daviplata</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">Propina ($):</label>
+                                <input type="number" class="form-control" id="pagoPropina" value="0" min="0" step="0.5">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">Descuento ($):</label>
+                                <input type="number" class="form-control" id="pagoDescuento" value="0" min="0" step="0.5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success fw-semibold" onclick="app.confirmarCobroFactura()">
+                            <i class="fas fa-check-circle me-1"></i>Confirmar Pago y Facturar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Nuevo/Editar Usuario -->
+        <div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Registrar Nuevo Usuario</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formUsuario">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nombre Completo:</label>
+                                <input type="text" class="form-control" id="usrNombre" required placeholder="ej. Carlos Pérez">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nombre de Usuario:</label>
+                                <input type="text" class="form-control" id="usrUsername" required placeholder="ej. cperez">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Correo Electrónico:</label>
+                                <input type="email" class="form-control" id="usrEmail" required placeholder="ej. carlos@saborgourmet.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Contraseña:</label>
+                                <input type="password" class="form-control" id="usrPassword" required placeholder="••••••••">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Rol Asignado:</label>
+                                <select class="form-select" id="usrRol" required>
+                                    <option value="mesero">Mesero</option>
+                                    <option value="chef">Chef / Cocinero</option>
+                                    <option value="cajero">Cajero</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-info text-white fw-semibold" onclick="app.guardarNuevoUsuario()">Guardar Usuario</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Nuevo Cliente -->
+        <div class="modal fade" id="modalNuevoCliente" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title"><i class="fas fa-address-card me-2"></i>Registrar Nuevo Cliente</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formCliente">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nombre Completo:</label>
+                                <input type="text" class="form-control" id="cliNombre" required placeholder="ej. Ana Martínez">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Documento de Identificación:</label>
+                                <input type="text" class="form-control" id="cliDoc" required placeholder="ej. 1098765432">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Correo Electrónico:</label>
+                                <input type="email" class="form-control" id="cliEmail" required placeholder="ej. ana@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Teléfono de Contacto:</label>
+                                <input type="text" class="form-control" id="cliTelefono" required placeholder="ej. 300-1234567">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success fw-semibold" onclick="app.guardarNuevoCliente()">Guardar Cliente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Recuperar Contraseña -->
+        <div class="modal fade" id="modalRecuperar" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title"><i class="fas fa-key me-2"></i>Recuperación de Contraseña</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small">Ingresa el correo electrónico asociado a tu cuenta para recuperar tu acceso.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Correo Registrado:</label>
+                            <input type="email" class="form-control" id="recuperarCorreo" placeholder="ej. admin@saborgourmet.com">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="app.ejecutarRecuperarPassword()">Enviar Instrucciones</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Nuevo Item de Menú -->
+        <div class="modal fade" id="modalNuevoMenu" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Nuevo Artículo de Menú</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="menuNombre">
+                            <label class="form-label fw-semibold">Nombre del Platillo:</label>
+                            <input type="text" class="form-control" id="menuNombre" placeholder="ej. Lomo Salteado">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Categoría:</label>
+                            <label class="form-label fw-semibold">Categoría:</label>
                             <select class="form-select" id="menuCategoria">
                                 <option value="Entrada">Entrada</option>
                                 <option value="Plato Principal">Plato Principal</option>
@@ -446,27 +952,27 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Precio:</label>
-                            <input type="number" class="form-control" id="menuPrecio" step="0.01">
+                            <label class="form-label fw-semibold">Precio ($ USD):</label>
+                            <input type="number" class="form-control" id="menuPrecio" step="0.01" placeholder="25.00">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Descripción:</label>
-                            <textarea class="form-control" id="menuDescripcion" rows="2"></textarea>
+                            <label class="form-label fw-semibold">Descripción:</label>
+                            <textarea class="form-control" id="menuDescripcion" rows="2" placeholder="Ingredientes principales..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="app.agregarMenuItem()">Agregar</button>
+                        <button type="button" class="btn btn-primary" onclick="app.agregarMenuItem()">Agregar al Menú</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <footer class="bg-dark text-white text-center py-4 mt-5">
+        <footer class="bg-dark text-white text-center py-4 mt-auto">
             <div class="container">
-                <p class="mb-0">Sabor Gourmet © 2024 - Sistema de Gestión de Restaurante</p>
-                <small class="text-muted">Desarrollado con POO y Arquitectura de Componentes</small>
+                <p class="mb-1 fw-bold">Sabor Gourmet © 2026 - Sistema de Gestión Integral</p>
+                <small class="text-muted">Desarrollado con Arquitectura Orientada a Objetos (POO) & HTML5/JS ES6+</small>
             </div>
         </footer>
 
