@@ -17,6 +17,7 @@ class App {
         this.cargarDataDelStorage();
         this.renderizarMesas();
         this.renderizarMenu();
+        this.renderizarMesasDropdown();  // Rellenar dropdown de mesas
         this.renderizarPedidos();
         this.renderizarFacturacion();
         this.actualizarReportes();
@@ -66,6 +67,9 @@ class App {
         ];
 
         menuItems.forEach(item => this.restaurante.agregarMenuItemm(item));
+
+        // Rellenar dropdown de mesas
+        this.renderizarMesasDropdown();
 
         // Crear pedidos y facturas de demostración
         const mesa3 = this.restaurante.obtenerMesa(3);
@@ -177,7 +181,27 @@ class App {
 
     seleccionarMesa(mesaId) {
         this.mesaSeleccionada = this.restaurante.obtenerMesa(mesaId);
-        alert(`Mesa ${this.mesaSeleccionada.numero} seleccionada`);
+        
+        // Navegar automáticamente a Pedidos
+        this.navigarAPedidos();
+    }
+
+    navigarAPedidos() {
+        if (!this.mesaSeleccionada) {
+            alert('⚠️ Selecciona una mesa primero');
+            return;
+        }
+
+        // Simular clic en el botón de Pedidos
+        document.querySelector('.btn-link-nav[onclick*="pedidos"]').click();
+        
+        // Pre-seleccionar la mesa en el dropdown
+        setTimeout(() => {
+            const dropdown = document.getElementById('pedidoMesa');
+            if (dropdown) {
+                dropdown.value = this.mesaSeleccionada.id;
+            }
+        }, 200);
     }
 
     ocuparMesa(mesaId) {
@@ -360,6 +384,33 @@ class App {
         });
     }
 
+    renderizarMesasDropdown() {
+        const dropdown = document.getElementById('pedidoMesa');
+        if (!dropdown) return;  // El dropdown no existe en esta vista
+
+        dropdown.innerHTML = '<option value="">Selecciona una mesa</option>';
+
+        const mesas = this.restaurante.mesas.filter(m => m.estado === 'libre' || m.estado === 'ocupada');
+
+        if (mesas.length === 0) {
+            dropdown.innerHTML += '<option value="">No hay mesas disponibles</option>';
+            return;
+        }
+
+        mesas.forEach(mesa => {
+            const estado = mesa.estado === 'libre' ? '(Libre)' : '(Ocupada)';
+            const option = document.createElement('option');
+            option.value = mesa.id;
+            option.textContent = `Mesa ${mesa.numero} - ${mesa.capacidad} personas ${estado}`;
+            dropdown.appendChild(option);
+        });
+
+        // Pre-seleccionar mesa si fue seleccionada antes
+        if (this.mesaSeleccionada) {
+            dropdown.value = this.mesaSeleccionada.id;
+        }
+    }
+
     agregarAlPedido(menuItemId) {
         if (!this.pedidoActual) {
             const mesaId = document.getElementById('pedidoMesa').value;
@@ -481,16 +532,22 @@ class App {
 
     guardarPedido() {
         if (!this.pedidoActual || this.pedidoActual.items.length === 0) {
-            alert('⚠️ El pedido está vacío');
+            alert('⚠️ El pedido está vacío. Agrega al menos un item.');
             return;
         }
+
+        const mesaNumero = this.pedidoActual.mesa.numero;
+        const totalPedido = (this.pedidoActual.total * 1.19).toFixed(2);
 
         this.pedidoActual.cambiarEstado('preparacion');
         this.guardarDataEnStorage();
         this.renderizarPedidos();
+        this.renderizarMesasDropdown();
         this.pedidoActual = null;
         this.renderizarPedidoActual();
-        alert('✅ Pedido guardado correctamente');
+        
+        // Mejor feedback al usuario
+        alert(`✅ Pedido guardado correctamente\nMesa: ${mesaNumero}\nTotal: $${totalPedido}\n\nEl pedido está en preparación`);
     }
 
     limpiarPedido() {
@@ -591,6 +648,52 @@ class App {
             `;
             tbody.innerHTML += html;
         });
+    }
+
+    renderizarMesasOcupadasFacturacion() {
+        const container = document.getElementById('mesasOcupadasFacturacion');
+        if (!container) {
+            // El contenedor no existe, lo crearemos dinámicamente
+            console.log('Contenedor de mesas ocupadas no existe en HTML');
+            return;
+        }
+
+        container.innerHTML = '';
+
+        const mesasOcupadas = this.restaurante.mesas.filter(m => m.estado === 'ocupada');
+
+        if (mesasOcupadas.length === 0) {
+            container.innerHTML = `
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay mesas ocupadas actualmente
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <div class="mb-3">
+                <h6 class="text-muted text-uppercase">
+                    <small><strong>Mesas Ocupadas (${mesasOcupadas.length})</strong></small>
+                </h6>
+            </div>
+            ${mesasOcupadas.map(mesa => `
+                <div class="mb-2 p-2 bg-warning bg-opacity-10 rounded">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Mesa ${mesa.numero}</h6>
+                            <small class="text-muted">${mesa.capacidad} personas</small>
+                        </div>
+                        ${mesa.pedido ? `
+                            <span class="badge bg-warning">Pedido #${mesa.pedido.id}</span>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('')}
+        `;
+
+        container.innerHTML = html;
     }
 
     generarFactura(pedidoId) {
@@ -739,8 +842,14 @@ class App {
         // Actualizar datos según el módulo
         if (modulo === 'facturacion') {
             this.renderizarFacturacion();
+            this.renderizarMesasOcupadasFacturacion();
         } else if (modulo === 'reportes') {
             this.actualizarReportes();
+        } else if (modulo === 'pedidos') {
+            this.renderizarMesasDropdown();
+            this.renderizarMenu();
+        } else if (modulo === 'mesas') {
+            this.renderizarMesas();
         }
     }
 
