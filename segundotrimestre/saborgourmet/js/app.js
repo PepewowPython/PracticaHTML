@@ -9,6 +9,7 @@ class App {
         this.mesaSeleccionada = null;
         this.pedidoActual = null;
         this.moduloActual = 'dashboard';
+        this.recordarSesion = false;
         
         this.init();
     }
@@ -51,7 +52,7 @@ class App {
                 pedidos: this.restaurante.pedidos.map(p => p.obtenerDetalles()),
                 facturas: this.restaurante.facturas.map(f => f.obtenerDetalles()),
                 auditoria: this.restaurante.auditoria.map(a => a.obtenerDetalles()),
-                usuarioActual: this.restaurante.usuarioActual ? this.restaurante.usuarioActual.username : null
+                usuarioActual: this.recordarSesion && this.restaurante.usuarioActual ? this.restaurante.usuarioActual.username : null
             };
             localStorage.setItem('saborGourmetData', JSON.stringify(data));
         } catch (e) {
@@ -186,6 +187,7 @@ class App {
         const cred = document.getElementById('loginUsuario').value.trim();
         const pass = document.getElementById('loginPassword').value.trim();
         const errAlert = document.getElementById('loginErrorAlert');
+        this.recordarSesion = document.getElementById('rememberMe').checked;
 
         const res = this.restaurante.autenticar(cred, pass);
         if (res.exito) {
@@ -204,6 +206,7 @@ class App {
     ejecutarLogout() {
         if (confirm('¿Deseas cerrar sesión en el sistema Sabor Gourmet?')) {
             this.restaurante.cerrarSesion();
+            this.recordarSesion = false;
             this.guardarDataEnStorage();
             this.verificarSesion();
         }
